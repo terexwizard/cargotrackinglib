@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<f:metadata>
+    <f:viewParam name="aname" value="#{bKBCUploadFilePage.name}" />
+</f:metadata>   
+ 
+<h:head>
+    <title>ระบบงาน</title>
+    <h:outputStylesheet name="style.css" library="css" />
+    <h:outputStylesheet name="style_s.css" library="css" />
+</h:head>
+<h:body>
+<h:form id="formuf" enctype="multipart/form-data" prependId="false" >
+<p:panelGrid style="width:100%;" styleClass="showBordersx"  >    
+                <p:row>
+                    <p:column colspan="3" >
+                        <ui:remove><!--
+                        <p:outputLabel value="ไฟล์ประเภท #{bKBCUploadFile.filetype}" 
+                                       style="font-weight:bold;color: #0079ce;"/>
+                        &nbsp;
+                        --></ui:remove>
+                        
+                        <ui:param name="filetypekey" value="filetype_#{bKBCUploadFilePage.name}" />
+                        <ui:param name="filetyped" value="#{bKBCUploadFile.filetypemap[filetypekey]}" />
+                        <ui:param name="filetypedisp" value="#{ not empty filetyped ? 'ชนิด ' : '' }#{filetyped}" />
+                        
+                        
+                        <p:outputLabel value="#{msgs.msgsizefile2} #{filetypedisp}" 
+                                       style="font-weight:bold;color: #0079ce;"/>
+                        &nbsp;
+                        <p:outputLabel value="#{bKBCUploadFile.messageerror}" 
+                                       style="font-weight:bold;color: red;"/>
+                        
+                    </p:column>
+                </p:row> 
+<p:row>
+<p:column style="width:70%"  >
+    <p:outputLabel title="#{bKBCUploadFilePage.name}" >&nbsp;&nbsp;</p:outputLabel>
+    <p:fileUpload 
+            mode="simple" 
+            auto="true"  
+            sizeLimit="200"    
+            styleClass="f1-fileupload"
+            id="cpuf111zxc" 
+
+            style="width: 90%"
+            value="#{bKBCUploadFile.upfile}"
+            
+            > 
+        </p:fileUpload>
+        
+</p:column>    
+<p:column style="width:30%;">
+        
+        <p:commandButton value="อัพโหลด" ajax="false"  id="cpufppcbf638ph"
+                         actionListener="#{bKBCUploadFile.uploadFile}"
+                         styleClass="butt-c1"
+                         title="ควรอัพโหลดไฟล์ชื่อภาษาอังกฤษ"
+            /> 
+      
+</p:column>
+
+<p:column>
+    <ui:remove><!--
+        
+               <p:commandButton value="u"   id="cpufppcbf638phsd"
+                         type="button"
+                         onclick="b();"
+                         styleClass="butt-c1"
+                         title="กรุณาอัพโหลดไฟล์ชื่อภาษาอังกฤษเท่านั้น"
+            /> 
+               
+            <ui:param name="an" value="#{param.aname}" />
+               
+          #{param.aname}//#{an}//#{bKBCUploadFilePage.name}
+               
+        <p:tooltip for="#{component.clientId}" style="max-width:400px;"    >
+                <h:outputLabel  escape="false" 
+                  value="กรุณาแนบไฟล์ชื่อภาษาอังกฤษเท่านั้น " ></h:outputLabel>
+        </p:tooltip>
+               
+    4.
+    #{bKBCUploadFile.upfileoriname} / #{bKBCUploadFile.upfilesize} / #{bKBCUploadFile.upfilecontenttype}
+    <br/>
+    #{param['aname']} # #{bKBCUploadFile.detailtableattachname} ## #{bKBCUploadFile.detailtable}
+               
+               <input type="hidden" id="aname" name="anmae" value="#{param['aname']}"  />
+               
+    
+    function upfile(){
+        //alert('aa');
+        
+        //var vipf   = document.getElementById("cpuf111zxc");
+        
+        //alert(vipf.value);
+        
+        //setTimeout( cup , 100  );
+    }
+    
+    function cup(){
+        var cmdbu   = document.getElementById('cpufppcbf638ph');
+        alert(cmdbu);
+        cmdbu.click();
+    }
+    
+    function b(){
+        //document.getElementById("cpuf111zxc").click();
+        
+        var vipf   = document.getElementById("cpuf111zxc");
+        
+        vipf.onchange = upfile;
+
+        vipf.click();
+        
+    }               
+               
+    --></ui:remove>
+</p:column>    
+</p:row>
+</p:panelGrid>
+    
+<script type="text/javascript">   
+//<![CDATA[  
+    // #{bKBCUploadFilePage.name}
+     
+    function calluploadfinish(){
+        
+        //alert(parent.#{bKBCUploadFilePage.name}_uploadfinish);
+        parent.#{bKBCUploadFilePage.name}_uploadfinish("#{bKBCUploadFile.upfilename}" , #{bKBCUploadFile.upfilesize});
+        
+    }
+    
+    #{ not bKBCUploadFile.justupload ? "" : "calluploadfinish();"}
+
+ //]]>   
+</script>  
+    
+ <ui:remove><!--
+     // error 
+<ui:include src="#{bKBAppVar.COMPO_MASG}" >
+  <ui:param name="basebean" value="#{bKBCUploadFile}"/>
+</ui:include>
+     --></ui:remove>
+</h:form>
+</h:body>
+</html>
+

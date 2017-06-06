@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    
+    
+<ui:component>
+    
+    
+<iframe scrolling="no" frameborder="0" name="inetdocx" src="/inetdocsigner13/signdocxscript?type=signer&amp;securecode=#{basebean.securecode}" 
+        style="width:50px; height:80px; border: 0px" tabindex="-1" >    
+</iframe>
+
+    
+<script type="text/javascript">   
+//<![CDATA[    
+    var signer;
+    var SignerMessages;
+    var vers;
+    function docxsign_onload(){
+
+        signer = inetdocx.docxSigner();                
+        SignerMessages = signer.SignerMessages;
+        signer.version();
+        
+    }
+
+    function stateNotify(state){
+        //alert(state);
+//        window.status   = state;
+//        
+//        if(state===2000){
+//            
+//        }
+        
+    }
+    
+    function signer_setCert(fieldname , fieldvalue){
+        
+        signer.setCertificate(fieldname, fieldvalue);
+        
+    }
+    
+    function signer_addMeta(fieldname , fieldvalue){
+        
+        signer.addMetadata(fieldname, fieldvalue);
+        
+    }
+    
+    function signer_signDoc(refid){
+        var apprefid  = null;
+        if(refid == undefined){
+            
+        }else{
+            apprefid    = refid;
+        }
+        
+        signer.signDocument(apprefid);
+        
+    } 
+    
+//]]>   
+</script>
+    
+</ui:component>
+    
+    
+</html>
+

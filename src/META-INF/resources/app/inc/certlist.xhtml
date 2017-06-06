@@ -1,0 +1,190 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:component id="#{id}" >
+ 
+<p:dialog draggable="true" modal="true"  resizable="false"
+          widgetVar="#{id}msgdlgi1" header="certificates"
+      >
+    <p:scrollPanel style="height: 200px; width: 530px;" mode="native" id="#{id}scpdlg1"  >
+        <div align="left" class="ui-messages-info ui-corner-all" 
+             style="margin-top: 0px !important;margin-bottom: 0px !important; padding-top: 0px; padding-bottom: 0px;" >
+        
+            <span class="ui-messages-info-summary" id="#{id}msgcontent1">-</span>
+
+        </div>
+    </p:scrollPanel>
+    <br/>
+    <div align="center" >
+        <p:commandButton value="ปิด" onclick="#{id}msgdlgi1.hide();" type="button" ></p:commandButton>
+    </div>
+</p:dialog>
+    
+<script type="text/javascript">   
+//<![CDATA[    
+
+
+function #{id}_showlist(trustissuer){
+    
+     signer.resetTrustedProvider();
+     
+     signer.setDateLocale("th", "TH");
+     signer.setDateFormat("dd/MM/yyyy HH:mm");
+        
+     signer.setTrustedProvider(trustissuer);
+     
+     certArray = signer.queryCerttificates();
+     
+     //alert(certArray);
+     
+     if (certArray === null){
+        alert("Certificate not found");
+        return;
+    }
+     
+    
+     var msg    = document.getElementById('#{id}msgcontent1');
+   
+     var content    = "<table border='0' cellspacing='1' style='width:500px;' >";
+            
+            var cnt = certArray.length;
+            var sp  = document.getElementById('form1:#{id}scpdlg1');
+            
+            if (cnt <= 1){
+                sp.style.height    = "200px";
+            }else if (cnt <= 2){
+                sp.style.height    = "300px";
+            }else{
+                sp.style.height    = "400px";
+            }
+            
+            for(i=0; i<certArray.length; i++){
+                // certString += (i+1) + ". " + certArray[i] + "\r\n";
+
+                var certi   = certArray[i].split("<F>");
+
+                var name    = certi[0];
+                var issuer  = certi[1];
+                var dateis  = certi[2];
+                var dateep  = certi[3];
+                var tp      = certi[4];
+                
+                 content += "<tr ><td style='vertical-align: top;'><label class='label_bold2' >"+(i+1)+".</label></td>"+
+                         "<td style='vertical-align: top;' >"+
+                        "<button  class='ui-button f1-p-button-view-cert' onclick='#{id}selectcert(\"" + tp +"\");' "+
+                        " type='button' title='เลือกรายการ'  /></td> "+
+                        "<td style='padding-bottom: 10px !important;' " +
+                        " >Name : <label class='label_bold2' >" +name + " </label>" +
+                        "<br/>Issuer : <label class='label_bold2' >"+issuer+" </label> " +
+                        "<br/>Issue Date : <label class='label_bold2' >"+dateis+" </label> " +
+                        "<br/>Expire Date : <label class='label_bold2' >"+ dateep  + " </label> " +
+                        "<br/>Thumb : <label class='label_bold2' >"+tp+" </label></td>" +
+                        "</tr>";
+
+
+            }
+            
+            
+//            for(i=0; i<=cnt ; i++){
+//                var tp      = "";
+//                var name    = "";
+//                if(i==0){
+//                    name    = "MR. THAKUL MARKSUMLEE";
+//                    tp      = "9c45f00d644de630252050d13246c4285c38d2f4";
+//                    dateis  = "17/06/2556";
+//                    dateep  = "31/12/2556";
+//                }else if(i==1){
+//                    name    = "SUMMIT COMPUTER CO., LTD.";
+//                    tp      = "5d249228148a6c6ea025edbde5dd90bce757e4d1";
+//                    dateis  = "17/06/2556";
+//                    dateep  = "31/12/2556";
+//                }else if(i==2){
+//                    name    = "MR. SATHIT JUNJAROEN";
+//                    tp      = "8e785176db63da31492d2d32bd823f2c88d5ca1f";
+//                    dateis  = "20/06/2556";
+//                    dateep  = "31/12/2556";
+//                }else if(i==3){
+//                    name    = "Thai Academy of Science and Technology Foundation";
+//                    tp      = "67462aff1ff301bbf2de883b0420b8418fe2cdfc";
+//                    dateis  = "20/06/2556";
+//                    dateep  = "31/12/2556";
+//                }else if(i==4){
+//                    name    = "Thai Academy of Science and Technology Foundation";
+//                    tp      = "2670e85ac93c6b3b532592f8e09ab3744a6ea906";
+//                    dateis  = "20/06/2556";
+//                    dateep  = "31/12/2556";
+//                }      
+//                
+//                
+//                content += "<tr ><td >"+
+//                        "<button  class='ui-button f1-p-button-view-cert' onclick='#{id}selectcert(\"" + tp +"\");' "+
+//                        " type='button' /></td> "+
+//                        "<td style='padding-top: 10px !important; padding-bottom: 10px !important;' " +
+//                        " >Name : <label class='label_bold2' >" +name + " </label>" +
+//                        "<br/>Issue : <label class='label_bold2' >"+dateis+" </label> " +
+//                        "<br/>Expire : <label class='label_bold2' >"+ dateep  + " </label> " +
+//                        "<br/>Thumb : <label class='label_bold2' >"+tp+" </label></td>" +
+//                        "</tr>";
+//            }
+            
+            content += "</table>";
+   
+   
+     msg.innerHTML   = content;
+        
+     #{id}msgdlgi1.show();   
+}
+
+
+function #{id}selectcert(thp){
+    
+    #{id}msgdlgi1.hide();
+            
+    try{
+
+       #{id}_selectedcert(thp);
+
+    }catch(e){}
+
+}
+
+function #{id}_getcert(thp){
+     
+    if (!signer.findCertificateBy("THP", thp)){
+         alert("Certificate not found");
+         return;
+     }
+     
+     var value = signer.getBase64Certificate();
+     
+     return value;       
+}
+
+function #{id}_getcertdetail(name){
+    
+    //alert(signer.certificateField("SubjectDN"));
+    //value = signer.getCertificateDetail(signer.certificateField("SubjectDN"));
+    value = signer.getCertificateDetail(signer.certificateField(name));
+    return value;
+}
+
+function #{id}_getcertpartformdn(name, subjectdn){
+    
+    //alert(signer.certificateField("SubjectDN"));
+    //value = signer.getCertificateDetail(signer.certificateField("SubjectDN"));
+    value = signer.getPartFromDN(subjectdn, name);
+    return value;
+}
+
+
+//]]>   
+</script>
+</ui:component>
+    
+    
+</html>
+

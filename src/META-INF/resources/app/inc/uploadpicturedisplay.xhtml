@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>ระบบงาน</title>
+    <h:outputStylesheet name="style.css" library="css" />
+    <h:outputStylesheet name="style_s.css" library="css" />
+</h:head>
+<h:body>
+<p:panelGrid style="width:95%;" styleClass="showBordersx" >  
+<p:row rendered="#{not empty bKBCUploadFile.messageerror}">
+    <p:column><p:outputLabel value="#{bKBCUploadFile.messageerror}" 
+                                       style="font-weight:bold;color: red;"/></p:column>
+</p:row>    
+<p:row>
+<p:column>
+    <p:graphicImage value="/#{bKBCUploadFile.upfilenamepath}"  style="border: 0px" cache="false"
+                     width="360px"  >
+    </p:graphicImage>
+</p:column>
+</p:row>
+</p:panelGrid>
+</h:body>
+</html>
+

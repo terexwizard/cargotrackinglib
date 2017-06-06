@@ -1,0 +1,226 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:component id="docxdocsigner" >
+
+
+<p:outputPanel id="signerpan" style="display:none;" >
+    
+    <br/>
+    <p:inputText  id="datasref" value="#{basebean.datasref}"  size="40"   />
+    <p:inputText  id="attsref" value="#{basebean.attsref}"  size="40"   />
+    <p:inputText  id="attsblob" value="#{basebean.attsblob}"  size="40"   />
+    <p:inputText  id="attsinfo" value="#{basebean.attsinfo}"  size="40"   />
+    <br/>
+    <p:inputTextarea id="datafors" value="#{basebean.datafors}" 
+                     cols="100" rows="20"  
+                     autoResize="false"  />
+    
+    <br/>
+    <p:inputTextarea id="attfors" value="#{basebean.attfors}" 
+                     cols="100" rows="5"  
+                     autoResize="false"  />
+    
+
+<script type="text/javascript">
+
+var afs         = #{ empty basebean.attfors ? '[]' : basebean.attfors}; 
+var adocc       = afs.length;
+
+function signrow(){
+
+    if(#{basebean.startsign}){
+
+//        alert(#{basebean.attfors});
+        
+        signer.setCertificate("THP", "#{certthumbprint}");
+        
+        sgerror     = false;
+        stype       = 1;
+        
+        adocloop        = 0;
+        adocdgref       = "";
+        adocdgb         = "";
+        adocdgi         = "";
+
+        
+//        startsign();
+        setTimeout( startsign , 100  );
+    }
+
+}
+
+#{basebean.startsign?"signrow();":"" }
+
+</script>
+
+</p:outputPanel>    
+    
+    
+<script type="text/javascript">   
+//<![CDATA[    
+
+var stype       = 1;
+var adocloop    = 0;
+
+var adocdgref   = "";
+var adocdgb     = "";
+var adocdgi     = "";
+
+var rdi         = "#{bKBLibVar.TEXT_CONCAT_DELIMITER_ROW}";
+var fdi         = "#{bKBLibVar.TEXT_CONCAT_DELIMITER_COLUMN}";
+var sgerror     = false;
+var sv;
+
+function startsign(){
+    
+            cursorwait();
+            
+            var msg     = "กำลังลงนามยืนยันเอกสาร .... ";
+            showMsgInfo(msg);
+            
+            signer.resetMetaData();
+            
+            if( stype == 1 ){
+                
+                var inp = document.getElementById('#{formid}:datafors');
+
+                signer.addMetadata("#{bKBLibVar.SIGNATURE_DATA_KEYNAME}", inp.value);
+
+                signer_signDoc();
+    
+            }else if( stype == 2 ){
+            
+                if(sgerror){
+                    return ;
+                }
+
+//                for( adocloop = 0 ; adocloop<adocc ; adocloop++){
+//                alert("signdoc "+adocloop +"/"+adocc);
+                
+                if(adocloop<adocc){
+                    
+                    
+                    var adc     = afs[adocloop];
+                        //alert(adc +"\r\n"+adc.length);
+                        
+                        adocloop++;
+
+                        if(adc != null && adc.length >=3 ){
+                            var b       = adc[0];
+                            var p       = adc[1];
+                            var c       = adc[2];
+
+                            adocdgi     += c + rdi;
+
+                            b   =  b.replace(/^\s+|\s+$/g,'');
+    //                        alert(adocloop+".  "+b+"::"+p+" => "+c);
+
+                            // check for null/blank blob
+                            if(b != "" && b != "null"){
+
+    //                            signer.addMetadata("imagedata", b);
+                                signer.setDocument(b, p);
+                                
+                                signer_signDoc();
+                                
+                            }else{
+
+                                adocdgref   += "" +rdi;
+                                adocdgb     += "noblob" +rdi;
+                                sv  = setTimeout( startsign , 100  );
+                            }
+                        }
+ 
+                 }else{     // end loop
+                     
+//                    alert("loop "+adocloop);
+                    window.status   = "finish.";
+                    
+                    cursordefault();
+
+                    //alert(adocdgi+"\r\n"+adocdgb);
+
+                    document.getElementById('#{formid}:attsref').value = adocdgref;
+                    document.getElementById('#{formid}:attsblob').value = adocdgb;
+                    document.getElementById('#{formid}:attsinfo').value = adocdgi;
+
+//                    changeMsgInfo("ลงนามยืนยันเอกสาร สำเร็จเรียบร้อย");
+//
+//                    document.getElementById('form1:savedg').click();
+                     
+                     alert("finish ");
+                     
+                     if(signdoc_finish != "undefined"){
+                         
+                         signdoc_finish();
+                         
+                     }
+                     
+                 }
+
+            }
+            
+}
+
+
+function signNotify(status, refId, sigBlobId, sigParts, appRefId){
+    
+    //getbyid("form1:signrefid").value    = refId;
+    
+    //alert(""+stype +"  " +adocloop +". >> "+status +": " + refId + "\r\n SigXBlob: " + sigBlobId + "/" + sigParts);
+        
+        window.status   = "signing finish "+status+"//"+refId;
+        
+        cursordefault();
+        
+        if(status === "YES"){
+                        
+            if(stype===1){
+                
+                document.getElementById('#{formid}:datasref').value = refId;
+                
+                stype   = 2;
+                //startsign();
+                sv  = setTimeout( startsign , 100  );
+                
+            }else if(stype===2){
+                
+
+                    adocdgref   += refId +rdi;
+                    adocdgb     += sigBlobId +rdi;
+                    
+                    sv  = setTimeout( startsign , 100  );
+                    
+            }
+
+        }else{
+            
+            //alert("การเข้าถึงใบรับรองไม่ถูกต้อง  \r\n "+status+"/"+ refId);
+            //document.getElementById('form1:savesendo').click();
+            sgerror = true;
+            
+            closeMsgInfo();
+            showMsgError("การลงนามเอกสารไม่สำเร็จ กรุณาตรวจสอบข้อมูลและใบรับรอง");
+                        
+        }
+        
+        
+}
+
+//]]>   
+</script>
+    
+<ui:remove><!--
+
+
+--></ui:remove>
+    
+</ui:component>
+    
+    
+</html>
+

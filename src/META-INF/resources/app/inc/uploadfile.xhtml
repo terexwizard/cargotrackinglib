@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<ui:composition>
+    <ui:remove><!--
+    #{basebean} / #{method} / #{update} //#{update eq ':' ? '' : update}
+               
+    <c:set value="#{dt}" target="#{bKBCUploadFile}" property="detailtable" ></c:set>
+    <c:set value="#{name}" target="#{bKBCUploadFile}" property="detailtableattachname" ></c:set>
+               
+               
+    <c:set scope="request" target="#{bKBCUploadFile}" property="detailtable" value="#{dt}" />
+    <c:set scope="request" target="#{bKBCUploadFile}" property="detailtableattachname" value="#{name}" />
+               
+     // Test ======================
+     AAA= #{dt} // #{name} <br/> 
+               
+     <br/><br/> fl >>>>
+        #{bKBCUploadFile.dtmap}
+      <br/>          
+               // Test ======================
+    --></ui:remove>
+    
+    <c:set target="#{bKBCUploadFile.dtmap}" property="dt_#{name}" value="#{dt}" ></c:set>
+    <c:set target="#{bKBCUploadFile.mtmap}" property="mt_#{name}" value="#{method}" ></c:set>
+    <c:set target="#{bKBCUploadFile.filetypemap}" property="filetype_#{name}" value="#{filetype}" ></c:set>
+    
+    <p:outputLabel title="c #{name}"  >&nbsp;&nbsp;</p:outputLabel>
+    <iframe frameborder="0" 
+                src="inc/uploadfilepage.xhtml?#{bKBCUploadFile.rskey}&amp;aname=#{name}"
+                scrolling="no"
+         style="width:95%; height:55px; border: 0px;display: inline;" tabindex="-1" />
+     
+    <p:commandButton value="ตกลง"  rendered="#{empty method ? false : true}" id="#{name}_cpufcb11qw"
+                     update="#{update}" 
+                               actionListener="#{basebean[method]}"
+                               style="display: none;"
+                               oncomplete="try{#{callfuncjs}}catch(e){}"
+                               ></p:commandButton>
+<script type="text/javascript">   
+//<![CDATA[  
+    // #{name}
+    function #{name}_uploadfinish( filename , filesize){
+        //alert(""+filename +" size :" +filesize );
+        
+        #{empty callback ? "" : callback}#{empty callback? "" : "(filename);"}
+        
+        if(#{empty method ? "false" : "true"}){
+            document.getElementById('#{formid}:#{name}_cpufcb11qw').click();
+        }
+    }
+//]]>   
+</script>
+</ui:composition>
+    
+</html>
+

@@ -1,0 +1,334 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:component id="#{id}" >
+<p:dialog draggable="true" modal="true"  resizable="false"
+          widgetVar="#{id}msgdlgi1" header="certificates"
+      >
+    <p:scrollPanel style="height: 200px; width: 530px;" mode="native" id="#{id}scpdlg1"  >
+        <div align="left" class="ui-messages-info ui-corner-all" 
+             style="margin-top: 0px !important;margin-bottom: 0px !important; padding-top: 0px; padding-bottom: 0px;" >
+        
+            <span class="ui-messages-info-summary" id="#{id}msgcontent1">-</span>
+
+        </div>
+    </p:scrollPanel>
+    <br/>
+    <div align="center" >
+        <p:commandButton value="ปิด" onclick="#{id}msgdlgi1.hide();" type="button" ></p:commandButton>
+    </div>
+</p:dialog>
+    
+<script type="text/javascript">   
+//<![CDATA[    
+
+function failNotify(message, appRefId, errorCode, errorMessage){
+    cursordefault();
+
+    alert(message + " fail. [" + errorCode + ": " + errorMessage + "] "+appRefId);
+}
+
+            
+function successNotify(message, appRefId, responseData){
+        
+//    alert(message+ " // "+appRefId +" ,"+SignerMessages.QueryCerttificates+ 
+//                    "==> \r\n\r\n " +responseData );
+
+     if (message  === SignerMessages.Version){
+        signForm.version.value = responseData;
+    } else if (message  === SignerMessages.QueryCerttificates){
+        
+        pcrQuery(responseData);
+        
+//        if (responseData === null){
+//            alert("Certificate not found");
+//            return;
+//        }
+//        var certString = "";
+//        for(i=0; i<responseData.length; i++){
+//            certString += (i+1) + ". " + responseData[i] + "\r\n\r\n";
+//        }
+//        signForm.certString.value = certString;
+    } else if (message  === SignerMessages.FindCertificateBy){
+//        signForm.certString.value = responseData;
+            pcrFindCertificateBy(responseData);
+    } else if (message  === SignerMessages.CertificateDetail){
+//        signForm.dnValue.value = responseData;
+
+            arrescertdt[resid]  = responseData;
+//            if(resid===1){
+//                resultSDN   = responseData;
+//            }else if(resid===2){
+//                resultIDN   = responseData;
+//            }
+
+            //alert("result = "+arrescertdt);
+            
+            if(resid < 3){
+                resid++;
+                getcertdt(resid);
+            }else{
+                
+                pcrFindCertPart();
+            }
+            
+    } else if (message  === SignerMessages.PartFromDN){
+//        alert(responseData);
+
+            arrescertpart[resid]  = responseData;
+            
+            if(resid < 2){
+                resid++;
+                getcertpart(resid, arrescertdt[0]);
+                
+            }else if(resid < 3){
+                resid++;
+                getcertpart(resid, arrescertdt[1]);
+            }else{
+                pcrFinish();
+            }
+            
+            
+    } else if (message  === SignerMessages.ErrorString){
+//        alert(responseData);
+    }
+}
+
+var resultfindcert;
+var thumbp;
+
+var resid           = 0;
+var arrescertdt         = new Array();
+var arrescertpart       = new Array();
+var arcertdtname        = new Array("SubjectDN" , "IssuerDN", "NotBefore" , "NotAfter");
+var arpartname          = new Array("UID" , "CN", "OU" , "CN" );
+
+function pcrFindCertificateBy(data){
+    resultfindcert  = data;
+    
+    arrescertdt     = new Array();
+    
+    resid       = 0;
+    getcertdt(resid);
+    
+}
+
+function pcrFindCertPart(){
+    
+    //alert(arrescertdt);
+    
+    resid           = 0;
+    getcertpart(resid, arrescertdt[0] );
+}
+
+function pcrFinish(){
+    
+//    alert("f :" +arrescertpart );
+    
+//    alert(typeof #{id}_selectedcertreturnx);
+
+    if(typeof #{id}_selectedcertreturn !== "undefined"){
+        
+        var arout   = new Array();
+        
+        
+        arout[0]      = arrescertdt[0];
+        arout[1]      = arrescertdt[1];
+        arout[2]      = arrescertdt[2];
+        arout[3]      = arrescertdt[3];
+        
+        arout[4]      = arrescertpart[0];
+        arout[5]      = arrescertpart[1];
+        arout[6]      = arrescertpart[2];
+        arout[7]      = arrescertpart[3];
+        arout[8]      = thumbp;
+        
+        var info       = arout.join('#{bKBLibVar.TEXT_CONCAT_DELIMITER_COLUMN}');
+        
+        arout[9]      = resultfindcert;
+        arout[10]     = info;
+        
+        #{id}_selectedcertreturn(arout);
+        
+    }
+    
+    cursordefault();
+    
+}
+
+function getcertdt(idx){
+    
+    signer.getCertificateDetail("ref"+idx, arcertdtname[idx]);
+    
+}
+
+function getcertpart(idx, sdn){
+//    alert("get >>> "+arpartname[idx] +">>"+ sdn)
+    signer.getPartFromDN("ref"+idx, sdn, arpartname[idx]);
+    
+}
+
+//function pcrFindCertificateBy1(data){
+//    resultfindcert  = data;
+//    
+//    resid       = 1;
+//    #{id}_getcertdetail("SubjectDN");
+//            
+//    resid       = 2;
+//    #{id}_getcertdetail("IssuerDN");
+//        
+//    resid       = 3;
+//    #{id}_getcertdetail("NotBefore");
+//        
+//    resid       = 4;
+//    #{id}_getcertdetail("NotAfter");
+//    
+//}
+
+function #{id}_showlist(trustissuer){
+    
+        //alert('13 ' + trustissuer);
+     //signer.resetTrustedProvider();
+     
+     cursorwait();
+     
+     signer.setDateLocale("th", "TH");
+     signer.setDateFormat("dd/MM/yyyy HH:mm");
+        
+     signer.setTrustedProvider(trustissuer);
+     signer.setValidDate(true);     
+     
+     signer.queryCerttificates("qry");
+     
+     //alert(certArray);
+}
+
+function pcrQuery(certArray){
+    
+
+     if (certArray === null || certArray.length === 0){
+        alert("Certificate not found");
+        return;
+    }
+     
+     
+    
+     var msg    = document.getElementById('#{id}msgcontent1');
+   
+     var content    = "<table border='0' cellspacing='1' style='width:500px;' >";
+            
+            var cnt = certArray.length;
+            var sp  = document.getElementById('form1:#{id}scpdlg1');
+            
+            if (cnt <= 1){
+                sp.style.height    = "200px";
+            }else if (cnt <= 2){
+                sp.style.height    = "300px";
+            }else{
+                sp.style.height    = "400px";
+            }
+            
+            for(i=0; i<certArray.length; i++){
+                // certString += (i+1) + ". " + certArray[i] + "\r\n";
+
+                var certi   = certArray[i].split("<F>");
+
+                var name    = certi[0];
+                var issuer  = certi[1];
+                var dateis  = certi[2];
+                var dateep  = certi[3];
+                var tp      = certi[4];
+                
+                 content += "<tr ><td style='vertical-align: top;'><label class='label_bold2' >"+(i+1)+".</label></td>"+
+                         "<td style='vertical-align: top;' >"+
+                        "<button  class='ui-button f1-p-button-view-cert' onclick='#{id}selectcert(\"" + tp +"\");' "+
+                        " type='button' title='เลือกรายการ'  /></td> "+
+                        "<td style='padding-bottom: 10px !important;' " +
+                        " ><a href='#wwsdee24' onclick='#{id}selectcert(\"" + tp +"\");' class='listcert' >" +
+                        "Name : <label class='label_bold2' >" +name + " </label>" +
+                        "<br/>Issuer : <label class='label_bold2' >"+issuer+" </label> " +
+                        "<br/>Issue Date : <label class='label_bold2' >"+dateis+" </label> " +
+                        "<br/>Expire Date : <label class='label_bold2' >"+ dateep  + " </label> " +
+                        "<br/>Thumb : <label class='label_bold2' >"+tp+" </label> </a>"+
+                        "</td>" +
+                        "</tr>";
+
+
+            }
+            
+            
+            content += "</table>";
+   
+   
+     msg.innerHTML   = content;
+        
+     cursordefault();
+     #{id}msgdlgi1.show();   
+}
+
+
+function #{id}selectcert(thp){
+    
+    #{id}msgdlgi1.hide();
+            
+    try{
+
+       #{id}_selectedcert(thp);
+
+    }catch(e){}
+
+}
+
+function #{id}_getcert(thp){
+     //alert('get '+thp);
+     
+     cursorwait();
+     
+     thumbp     = thp;
+     
+     signer.findCertificateBy("ref-1", "THP", thp);
+     
+//    if (!signer.findCertificateBy("THP", thp)){
+//         alert("Certificate not found");
+//         return;
+//     }
+//     
+//     var value = signer.getBase64Certificate();
+//     
+//     return value;       
+}
+
+//]]>   
+</script>
+    
+<ui:remove><!--
+
+//function #{id}_getcertdetail(name){
+//    //alert('get d :'+name);
+//    signer.getCertificateDetail(name);
+//    
+////    //alert(signer.certificateField("SubjectDN"));
+////    //value = signer.getCertificateDetail(signer.certificateField("SubjectDN"));
+////    value = signer.getCertificateDetail(signer.certificateField(name));
+////    return value;
+//}
+//
+//function #{id}_getcertpartformdn(name, subjectdn){
+//    //alert('n :'+name);
+//    signer.getPartFromDN(subjectdn, name);
+//    
+////    //alert(signer.certificateField("SubjectDN"));
+////    //value = signer.getCertificateDetail(signer.certificateField("SubjectDN"));
+////    value = signer.getPartFromDN(subjectdn, name);
+////    return value;
+//}
+
+--></ui:remove>
+</ui:component>
+    
+    
+</html>
+
